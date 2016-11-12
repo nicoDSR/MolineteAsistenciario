@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=medium-dpi" />
+        <link rel="stylesheet" type="text/css" href="css/index.css" />
+
+        <!-- DEBEMOS DECIDIR SI LOS SCRIPTS LOS PONEMOS EN NUESTRO SERVIDOR O EN LA APP-->
+        <link rel="stylesheet" href="css/themes/molinete-asistenciario-theme.min.css" />
+        <link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
+        <link rel="stylesheet" href="css/themes/jquery.mobile.structure-1.4.5.min.css" /> 
+        <link rel="stylesheet" href="css/molinetecss.css" /> 
+
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+  
+        <script src="js/jquery-1.11.3.min.js"></script>
+        <script src="js/jquery.mobile-1.4.5.min.js"></script>       
+        <script type="text/javascript" src="http://colegiodelosmolinos.edu.uy/conf.js"></script> 
+        <script type="text/javascript">
+            app.initialize();
+        </script>
+        <title>MOLINETE ASISTENCIARIO</title>
+
+    </head>
+    <body>  
+ 
+<!-- ************* PAGINA INICIAL #asistenciarioMain ************* -->
+<div data-role="page" id="asistenciarioMain">
+
+        <div data-role="header" class="ui-content" >
+            <img src="img/logo.png" style="margin:0px auto;display:block"/>
+        </div><!-- /header -->
+
+    <div role="main" class="ui-content">
+
+        <div id="initOptions" style="display: block;">
+            <div data-role="fieldcontain">
+                <label for="clasesList" class="select">Seleccione la clase:</label>
+                <select name="clasesList" id="clasesList" >
+                </select>
+            </div> 
+            <button onclick="asist.generarAsistenciario();">Iniciar Asistenciario</button>  
+        </div>
+
+        <div id="claseActualName"></div>
+    </div><!-- /content -->
+
+
+    <div data-role="main" class="ui-content" >
+            <span id="alumnosPanelTitle" style="display: none;"><p style="background-color: #2e9e6a; color: white;" >&nbsp En Clase</p></span>
+            <div data-role="controlgroup" id="alumnosPanel">
+              
+            </div>
+            <span id="ausentesPanelTitle" style="display: none;"><p style="background-color: #606fbf; color: white;">&nbsp Ausentes</p></span>
+            <div data-role="controlgroup" id="ausentesPanel">
+
+            </div>
+            <span id="retiradosPanelTitle" style="display: none;"><p style="background-color: #db5757; color: white;">&nbsp Retirados</p></span>
+            <div data-role="controlgroup" id="retiradosPanel">
+
+            </div> 
+            <br /><br />
+            <div id="errorMsg" style="color: red;"></div>
+
+            <p id="reiniciarBt" style="display: none;"><a href="#asistenciarioMain" data-role="button" data-mini="true" data-theme="d" data-icon="home" data-inline="false" onclick="asist.reiniciarAsistenciario();">Reiniciar</a></p>         
+    </div>   
+   
+  <!-- defaultpanel  -->
+  <div data-role="panel" id="defaultpanel" data-theme="b">
+   
+    <div class="panel-content" id="alumnoIndividualPanel" idAlumno="">
+      <h3 id="alumnoIndividualNombre" style="color: orange;"></h3>
+      <div id="sucesosAlumnoButtons" style="display: block;">
+        <a href="#" data-role="button" data-mini="true" data-theme="d" data-icon="plus" data-inline="false" onclick="asist.panhales();">Pañales</a>
+        <a href="#" data-role="button" data-mini="true" data-theme="d" data-icon="plus" data-inline="false" onclick="asist.mamaderas();">Mamaderas</a>
+        <a href="#" data-role="button" data-mini="true" data-theme="d" data-icon="plus" data-inline="false" onclick="asist.almuerzo();">Almuerzo</a>
+        <a href="#" data-role="button" data-mini="true" data-theme="d" data-icon="plus" data-inline="false" onclick="asist.postre();">Postre</a>
+        <a href="#" data-role="button" data-mini="true" data-theme="d" data-icon="plus" data-inline="false" onclick="asist.merienda();">Merienda</a>
+        <a href="#" data-role="button" data-mini="true" data-theme="d" data-icon="plus" data-inline="false" onclick="asist.siesta();">Siesta</a>
+        <a href="#" data-role="button" data-mini="true" data-theme="d" data-icon="plus" data-inline="false" onclick="asist.notas();">Nota</a>
+        <a href="#demo-links" data-rel="close" data-role="button" data-mini="true" data-theme="e" data-icon="camera" data-inline="false" onclick="asist.capturePhoto();">Tomar Foto</a>
+        <hr />
+        <a href="#demo-links" data-rel="close" data-role="button" data-mini="true" data-theme="e" data-icon="delete" data-inline="false" onclick="asist.marcarSalida();">Marcar Salida</a>
+        <a href="#demo-links" data-rel="close" data-role="button" data-mini="true" data-theme="e" data-icon="back" data-inline="false" onclick="asist.desmarcarEntrada();">Desmarcar Entrada</a>
+        <hr />
+        <!-- <a href="#demo-links" data-rel="close" data-role="button" data-mini="true" data-theme="a" data-icon="info" data-inline="false" onclick="asist.fichaDiariaAlumno();">Ver</a>
+        <a href="#demo-links" data-rel="close" data-role="button" data-mini="true" data-theme="a" data-icon="back" data-inline="false">Cancelar</a> -->
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#demo-links" style="margin: 6px;" class="ui-btn ui-corner-all" data-inline="true" onclick="asist.fichaDiariaAlumno();">Ver</a></li>
+                <li><a href="#demo-links" data-rel="close" style="margin: 6px;" class="ui-btn ui-corner-all" data-inline="true">Cancelar</a></li>
+            </ul>      
+        </div>
+      </div>
+      
+      <div id="sucesosPanel">
+    
+      </div>
+     
+    </div><!-- /content wrapper for padding -->
+  </div><!-- /defaultpanel -->
+</div><!-- /page asistenciarioMain -->
+
+  <div data-role="page" id="fichaDiariaPage" data-theme="b" >
+    <div role="main" id="fichaDiariaPanel" class="ui-content">
+    </div>
+    <div id="fichaDiariaNosefue">
+    </div>
+    <div>
+      <p><a href="#" onclick="asist.editarFichaDiaria();" class="ui-btn ui-shadow ui-corner-all" data-mini="true" >Editar</a></p> 
+      <p><a href="#asistenciarioMain" class="ui-btn ui-shadow ui-corner-all" data-mini="true" >Volver</a></p>
+    </div>
+  </div>
+
+  <div data-role="page" id="imagenPage" data-theme="b" >
+  <div role="main" id="imagenPanel" class="ui-content">
+    <img id="image" src="" style="width:75%; display: block; margin-left: auto; margin-right: auto;" />
+  </div>
+  <p><a href="#asistenciarioMain" class="ui-btn ui-shadow ui-corner-all" >Volver</a>
+     <a href="#asistenciarioMain" class="ui-btn ui-shadow ui-corner-all" onclick="asist.uploadImagen();">Subir imagen</a></p>  
+  </div>
+
+    <!-- En ésta página se solicita la habilitacion del asistenciario, se añade un mensaje destinado a la dirección-->
+    <div data-role="page" id="loginPage" >
+
+        <div data-role="header" class="ui-content" >
+            <img src="img/logo.png" style="margin:0px auto;display:block"/>
+        </div><!-- /header -->
+
+        <div role="main" class="ui-content">
+         <h3>Solicitar habilitación del asistenciario</h3>
+         <p>La aplicación Molinete es para uso exclusivo de los docentes del Colegio De los Molinos.</p>
+         <p>Puede solictar que se habilite este dispositivo para ser utilizado como un asistenciario.</p>
+         <hr />
+        <input type="text" name="nota" id="nota" placeholder="Mensaje">
+        <output type="text" id="notaerror" style="color:red"></output>
+        <hr />
+        <input type="button" value="Enviar solicitud" onclick="asist.enviarSolicitudAsistenciario()" />
+        <div id="errorSolicitudMsg" style="color: red;"></div>
+        </div>
+    </div>  
+
+    <!-- El objetivo de ésta página es informar al usuario que su solicitud de habilitación está pendiente de aprobación-->
+    <div data-role="page" id="solicitudEnviadaPage" >
+
+        <div data-role="header" class="ui-content" >
+            <img src="img/logo.png" style="margin:0px auto;display:block"/>
+        </div>
+
+        <div role="main" class="ui-content">
+          <h3>Su solicitud ya ha sido enviada</h3>
+          <p>El pedido de habilitación se encuentra en poder de la dirección de la Institución.</p>
+          <p>Se podrá acceder a la aplicación inmediatamente que este dispositivo sea habilitado.</p>
+          <hr />
+          <input type="button" value="Salir" onclick="asist.salir()" />
+          <div id="errorSolicitudMsg" style="color: red;"></div>
+        </div>
+    </div>
+
+    <div data-role="page" id="paginaError" >
+        <div data-role="header" class="ui-content" >
+            <img src="img/logo.png" style="margin:0px auto;display:block"/>
+        </div><!-- /header -->
+
+        <div role="main" class="ui-content">
+            <h3>Error de conexión</h3>
+            <p>No se ha podido establecer la conexión con el servidor. Vuelva a intentarlo más tarde.</p>
+            <p>Disculpe las molestias.</p>
+            <hr /> 
+            <input type="button" value="Salir" onclick="asist.salir()" />
+        </div>
+    </div>  
+
+    </body>
+</html>
