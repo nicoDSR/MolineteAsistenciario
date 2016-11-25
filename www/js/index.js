@@ -6,43 +6,37 @@ var app = {
     //
     // Bind any events that are required on startup. Common events are:
     // 'load', 'deviceready', 'offline', and 'online'.
+    //Bind te los eventos iniciales.
     bindEvents: function() {
         document.addEventListener('deviceready', this.onDeviceReady, false);
     },
-    // deviceready Event Handler
-    //
-    // The scope of 'this' is the event. In order to call the 'receivedEvent'
-    // function, we must explicitly call 'app.receivedEvent(...);'
+    //Cuando el dispositivo está pronto.
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
     },
-    // Update DOM on a Received Event
     receivedEvent: function(id) { 
-        console.log("receivedEvent: function(id)");
         asist.inicializar(host);
-        
     }
 }; 
 
 var asist = ( function(){
 
 var server = ""; //Se indica la ip del servidor.
-var fechaAsistenciario = '2016_4_19'; //Fecha actual del asistenciario.
+var fechaAsistenciario = ''; //Fecha actual del asistenciario.
 var deviceType; //Indica que tipo de sistema operativo utiliza el dispositivo
 var pictureSource; //Origen de donde se obtienen las imágenes (en este caso camara)
 var destinationType; //Destino de donde se obtienen las imágenes (en este caso camara)
-var asistenciarioData; //Deprecated
 var mapaAlumnosPics = {}; //Dado un id de alumno, indica que foto tiene como miniatura
 var asistenciario = {}; //Variable que representa el asistenciario en su totalidad. Cada item tiene fichadiaria y estado.
 var fichadiariaElegida; //Ficha diaria que ha sido recientemente elegida por el usuario.
 
-  var cargarItemEnPantalla = function (item){
+//Carga un item en pantalla dependiendo de su estado.    
+var cargarItemEnPantalla = function (item){
     var idFD = item.fichadiaria._id;
     var nombreAlumno = item.fichadiaria.alumno.nombres+" "+item.fichadiaria.alumno.apellidos;
     var idAl = item.fichadiaria.alumno.idAlumno;
     var htmlAlumnos;
-    console.log("cargarItemEnPantalla"+item);
-    if(item["estado"] == "Ausente"){
+    if(item["estado"] === "Ausente"){
         htmlAlumnos = "<li class='alumnosAusentesBt' id='"+item.fichadiaria._id+"' ><a type='submit' style='color:white;' onclick='asist.actionHandler(\""+item.fichadiaria._id+"\");'>";
         htmlAlumnos += nombreAlumno;
         htmlAlumnos += "<img src='"+mapaAlumnosPics[idAl]+"' style='width:75%; display: block; max-width: 100%; margin-left: auto; margin-right: auto; height: auto;'/>"; 
@@ -50,7 +44,7 @@ var fichadiariaElegida; //Ficha diaria que ha sido recientemente elegida por el 
         $("#ausentesPanel").append(htmlAlumnos);
         $("#ausentesPanelTitle").css("display", "block");
     } 
-    else if (item["estado"] == "En clase"){
+    else if (item["estado"] === "En clase"){
         htmlAlumnos = "<div class='alumnosEnclaseBt' id='"+item.fichadiaria._id+"'><a data-role=\"button\" data-rel=\"dialog\" type='submit' style='color:white;' onclick='asist.actionHandler(\""+item.fichadiaria._id+"\");'>";
         htmlAlumnos += nombreAlumno;
         htmlAlumnos += "<img src='"+mapaAlumnosPics[idAl]+"' style='width:75%; display: block; max-width: 100%; margin-left: auto; margin-right: auto; height: auto;'/>"; 
@@ -58,7 +52,7 @@ var fichadiariaElegida; //Ficha diaria que ha sido recientemente elegida por el 
         $("#alumnosPanel").append(htmlAlumnos); 
         $("#alumnosPanelTitle").css("display", "block");
     }
-    else if (item["estado"] == "Retirado"){ 
+    else if (item["estado"] === "Retirado"){ 
         htmlAlumnos = "<div class='alumnosRetiradosBt' id='"+item.fichadiaria._id+"'><a data-role=\"button\" data-rel=\"dialog\" type='submit' style='color:white;' onclick='asist.actionHandler(\""+item.fichadiaria._id+"\");'>";
         htmlAlumnos += nombreAlumno;
         htmlAlumnos += "<img src='"+mapaAlumnosPics[idAl]+"' style='width:75%; display: block; max-width: 100%; margin-left: auto; margin-right: auto; height: auto;'/>"; 
@@ -74,21 +68,18 @@ var crearMapaAlumnosPics = function(){
     $.getJSON( server+"/alumnosDeClase/"+$("#clasesList").val(), function( data ) {
         $.each( data, function( key, val ) {
             var pic = val.pic;
-            console.log(val.pic);
-            if (pic != null){
+            if (pic !== null){
                 mapaAlumnosPics[val._id] = val.url+"/"+val.nombreArchivo;
             }
             
         });
     });
 };
-var capturePhotoSuccess = function(imageURI) {
 //Si la toma de foto fue exitosa, se retorna esta función.
 //La imagen se carga en #image.
 //imageURI es el parámetro dónde obtenemos la ruta de la 
 //imagen en el móvil.
-    console.log(imageURI);
-    
+var capturePhotoSuccess = function(imageURI) {
     $("#image").attr("src", imageURI);
 
     $(':mobile-pagecontainer').pagecontainer('change', '#imagenPage', {
@@ -97,27 +88,23 @@ var capturePhotoSuccess = function(imageURI) {
                 reverse: true,
                 showLoadMsg: true
             });
-    
 };
 
 var capturePhotoFail = function(error){
-    if (error == "no image selected"){
-
-    }
-    else{
-        alert('Falla en la captura de la imagen. Motivo: ' + error);
-    }
-    
 };
+
+//Llamado cuando uploadImagen fue exitoso.
 var uploadImagenSuccess = function(r){
-    //Descripción: Llamado cuando uploadImagen fue exitoso.
+
     $("#image").attr("src", "");
 };
 
+//Si falla la subida de la imagen
 var uploadImagenFail = function(message){
     alert('Falla en la subida de la imagen. Motivo: ' + message);
-}
+};
 
+//Direcciona a la página que muestra el mensaje de error.
 var irAPaginaError = function() {
     $(':mobile-pagecontainer').pagecontainer('change', '#paginaError', {
         transition: 'flip',
@@ -130,16 +117,18 @@ var irAPaginaError = function() {
 //DECLARO LA API. 
 return {
 
+//Inicializa variables.
 inicializar :function(hostserver){
-
-    server = hostserver;
-    deviceType = (navigator.userAgent.match(/iPad/i))  == "iPad" ? "iPad" : (navigator.userAgent.match(/iPhone/i))  == "iPhone" ? "iPhone" : (navigator.userAgent.match(/Android/i)) == "Android" ? "Android" : (navigator.userAgent.match(/BlackBerry/i)) ==  "BlackBerry" ? "BlackBerry" : "null";
-    pictureSource = navigator.camera.PictureSourceType;
-    destinationType = navigator.camera.DestinationType;
-    server = host;
-    //SUSTITUI ESTO POR MI IP LOCAL, PARA PROBAR LOCALMENTE
-    //server = "http://192.168.1.45:8081";
-    asist.loadClases();   
+    $.getJSON("js/conf.json", function(result){
+        $.getJSON(result.host, function(result1){
+            server = result1.host;
+            deviceType = (navigator.userAgent.match(/iPad/i))  == "iPad" ? "iPad" : (navigator.userAgent.match(/iPhone/i))  == "iPhone" ? "iPhone" : (navigator.userAgent.match(/Android/i)) == "Android" ? "Android" : (navigator.userAgent.match(/BlackBerry/i)) ==  "BlackBerry" ? "BlackBerry" : "null";
+            pictureSource = navigator.camera.PictureSourceType;
+            destinationType = navigator.camera.DestinationType;
+            server = host;
+            asist.loadClases();  
+        });
+    }); 
 },    
     
 generarAsistenciario :function(){
@@ -150,34 +139,34 @@ generarAsistenciario :function(){
     $("#ausentesPanelTitle").css("display", "block");
     $("#retiradosPanelTitle").css("display", "block");  
     $.getJSON( server+"/alumnosDeClase/"+$("#clasesList").val(), function( dataAlumno ) {
-    //Pido todos los alumnos de la clase elegida. Voy a generar mapaAlumnosPic.    
+    //Pido todos los alumnos de la clase elegida. Voy a generar mapaAlumnosPic.   
+    //En caso de que tenga imagen asociado, cargo su ruta en el servidor.
+    //Si no tiene, pido la imagen por defecto. 
         for (i = 0; i < dataAlumno.length; i++){
-            if (dataAlumno[i].pic != null){
+            if (dataAlumno[i].pic !== null){
                 var pic = dataAlumno[i].pic;
-                if (pic != null){
+                if (pic !== null){
                         mapaAlumnosPics[dataAlumno[i]._id] = server+"/miniaturas/"+pic.nombreArchivo;
                 }
                 else{
-                    mapaAlumnosPics[dataAlumno[i]._id] = server+"/miniaturas/default.jpeg";
+                    mapaAlumnosPics[dataAlumno[i]._id] = "img/default.png";
                 }
             }
             else{
-                mapaAlumnosPics[dataAlumno[i]._id] = server+"/miniaturas/default.jpeg";
+                mapaAlumnosPics[dataAlumno[i]._id] = "img/default.png";
             }
         }
-        console.log(server+"/getAsistenciario/"+$("#clasesList").val()+"/"+fechaAsistenciario);
+        //Pide el asistenciario (conjunto de fichas diarias) para ese día determinado.
         $.getJSON( server+"/getAsistenciario/"+$("#clasesList").val()+"/"+fechaAsistenciario, function( data ) {
-        console.log("generarAsistenciario2"+ data);
             if (data.length > 0){
             //Existe el asistenciario para ese día.                
                 $.each( data, function( key, val ) {
                  //Itero por cada ficha diaria para ir cargando el asistenciario.   
-                    var asistenciarioItem = new Object();
+                    var asistenciarioItem = {};
                     asistenciarioItem.fichadiaria = val;
-                    console.log("generarAsistenciario2"+ val);
-                    if(val.entrada != null){ 
+                    if(val.entrada !== null){ 
                         //Tiene marcada la entrada.
-                        if (val.salida == null){
+                        if (val.salida === null){
                             asistenciarioItem['estado'] = "En clase";
                         }
                         else{
@@ -192,13 +181,13 @@ generarAsistenciario :function(){
                 });   
             }
             else{
+                //Pide crear el asistenciario (conjunto de fichas diarias) para ese día determinado.
                 $.post(server+"/crearAsistenciario/"+$("#clasesList").val(), function(result){
                     //Si se pudo crear el asistenciario.
                     if (result == "OK"){
                         //Pido el asistenciario recién creado.
                         $.getJSON( server+"/getAsistenciario/"+$("#clasesList").val()+"/"+fechaAsistenciario, function( data ) {
                             $.each( data, function( key, val ) {
-                    
                                 var asistenciarioItem = new Object();
                                 asistenciarioItem.fichadiaria = val;
                                 if(val.entrada != null){ 
@@ -236,15 +225,16 @@ generarAsistenciario :function(){
     });
 
 },
-loadClases : function(){
+
 //Corrobora que el dispositivo desde el cual se está ejecutando la aplicación esté registrado
 //como asistenciario. En caso de estarlo, despliega las clases para las cuales está habilitado 
 //en una lista, para que el usuario seleccione con cual desea trabajar.
 //En caso de no estar registrado aún, redirecciona a la página que ofrece enviar una solicitud
 //a la direccion del Colegio, para que habiliten el nuevo dispositivo como asistenciario.
+loadClases : function(){
     $.getJSON( server + "/clasesAsistenciario/" + device.uuid, function( data ) {
 
-        if(data == 1) {
+        if(data === 1) {
             $(':mobile-pagecontainer').pagecontainer('change', '#solicitudEnviadaPage', {
                 transition: 'flip',
                 changeHash: false,
@@ -275,6 +265,7 @@ loadClases : function(){
         }
     });
 },
+
 //Descripción: Realiza el manejo del evento de presionar sobre los item que representan a los alumnos.
 //Parámetro de entrada - item : Id de la ficha diaria asociada a ese alumno.
 actionHandler : function(item){
@@ -282,7 +273,6 @@ actionHandler : function(item){
     var ficha = asistenciario[itemKey];
     var jquerySelector = "#"+item;
     var nombreAlumno = ""+ficha.fichadiaria.alumno.nombres+" "+ficha.fichadiaria.alumno.apellidos;
-    console.log(ficha['estado']);
     if (ficha['estado'] == "Ausente"){
         $(jquerySelector).attr("href", "");
         $(jquerySelector).addClass("alumnosEnclaseBt").removeClass("alumnosAusentesBt");
@@ -308,6 +298,8 @@ actionHandler : function(item){
         asist.fichaDiariaAlumno();
     }
 },
+
+//Corrige el ingreso involuntario de un alumno a clase.
 desmarcarEntrada :function(){ 
     var jquerySelector = "#"+fichadiariaElegida.fichadiaria._id;
     var ficha = asistenciario[fichadiariaElegida.fichadiaria._id];
@@ -321,6 +313,8 @@ desmarcarEntrada :function(){
     });
 
 },
+
+//Indica que el alumno se retira de clase.
 marcarSalida :function(){
     var jquerySelector = "#"+fichadiariaElegida.fichadiaria._id;
     var ficha = asistenciario[fichadiariaElegida.fichadiaria._id];
@@ -328,11 +322,12 @@ marcarSalida :function(){
         $(jquerySelector).addClass("alumnosRetiradosBt").removeClass("alumnosEnclaseBt");
         $("#retiradosPanel").append($(jquerySelector));
         asistenciario[fichadiariaElegida.fichadiaria._id].estado = "Retirado";
-
     }).fail(function(jqXHR, textStatus, errorThrown) {
         irAPaginaError();
     });
 },
+
+//Corrige el marcado de salida involuntario.
 desmarcarSalida :function(){ 
     var jquerySelector = "#"+fichadiariaElegida.fichadiaria._id;
     var ficha = asistenciario[fichadiariaElegida.fichadiaria._id];
@@ -340,44 +335,40 @@ desmarcarSalida :function(){
         $(jquerySelector).addClass("alumnosEnclaseBt").removeClass("alumnosRetiradosBt");
         $("#alumnosPanel").append($(jquerySelector));
         asistenciario[fichadiariaElegida.fichadiaria._id].estado = "En clase";
-
     }).fail(function(jqXHR, textStatus, errorThrown) {
         irAPaginaError();
     });   
 },
+
+//Envía una solicitud a la direccion de la Institucion para que habiliten el dispositivo
+//como un asistenciario, y se pueda acceder a la aplicacion de ahí en más.
 enviarSolicitudAsistenciario :function() {
-    //Envía una solicitud a la direccion de la Institucion para que habiliten el dispositivo
-    //como un asistenciario, y se pueda acceder a la aplicacion de ahí en más.
     var error = false;
     var nota = $("#nota").val();
-
     if (nota == '' || nota == null){
         $("#notaerror").val("Debe ingresar un mensaje.");
         error = true;
     }
     if (!error){ 
-
         var dataSend = {"nota" : nota};
-
+        //Envía solicitud a la dirección.
         $.post(server+"/solicitarAsistenciario/" + device.uuid, dataSend, 'json').done(function( data ) {
-
-        $(':mobile-pagecontainer').pagecontainer('change', '#solicitudEnviadaPage', {
-            transition: 'flip',
-            changeHash: false,
-            reverse: true,
-            showLoadMsg: true 
-        });
-                
+            $(':mobile-pagecontainer').pagecontainer('change', '#solicitudEnviadaPage', {
+                transition: 'flip',
+                changeHash: false,
+                reverse: true,
+                showLoadMsg: true 
+            });        
         }).fail(function(jqXHR, textStatus, errorThrown) {
             irAPaginaError();
         });
     }
 },
+
+//Mostrar panel de suceso pañales. 
 panhales :function(){
     $("#sucesosPanel").html("");
-    
     var f = "<h3>Pañales</h3>";   
-
     f += "<label for='panhales-orino'>Orinó</label>";
     f += "<select name=\"panhales-orino\" id=\"panhales-orino\" >";
     f += "<option  value='Sí'>Sí</option>";
@@ -388,7 +379,6 @@ panhales :function(){
     f += "<option  value='Sí'>Sí</option>";
     f += "<option  value='No'>No</option>"; 
     f += "</select>";
-
     f += "<hr />";
     f +=  "<div data-role=\"navbar\" id=\"navBarButtons2\">";
     f +=  "<ul><li><button id=\"panhalesSend\" onclick=\"asist.enviarPanhales();\">Enviar</button></li>";
@@ -399,8 +389,9 @@ panhales :function(){
     $('#panhales-orino').selectmenu();
     $('#panhales-evacuo').selectmenu();
     $("#sucesosAlumnoButtons").css("display", "none");  
-
 },
+
+//Envia los datos del suceso pañales.
 enviarPanhales :function(){
     var registroPanhales = [];
     var dataSend = {};
@@ -419,12 +410,12 @@ enviarPanhales :function(){
         fichadiariaElegida.fichadiaria.panhales = JSON.stringify(dataSend); 
     }
     else{ 
+        //Hay registro previo de pañales para esa ficha diaria.
+        //Debemos agregar el nuevo suceso de manera incremental.
         var panhalesVar = JSON.parse(fichadiariaElegida.fichadiaria.panhales);
-        console.log(panhalesVar);
         var veces = parseInt(panhalesVar.veces) + 1;
         var orino = panhalesVar.orino; 
         var evacuo = panhalesVar.evacuo;
-        console.log(veces);
         veces = veces.toString();
         if ($("#panhales-orino").val() == "Si"){
             orino = "Si";
@@ -441,11 +432,12 @@ enviarPanhales :function(){
     var url = server+"/agregarSuceso/panhales/"+fichadiariaElegida.fichadiaria._id;
     $.post(url, dataSend, 'json').done(function( data ) {
         asist.cancelarSuceso();
-    
     }).fail(function(jqXHR, textStatus, errorThrown) {
         irAPaginaError();
     });
 },
+
+//Mostrar panel de suceso mamaderas.
 mamaderas :function(){
     $("#sucesosPanel").html("");
     var f = "<h3>Mamaderas</h3><form>";
@@ -463,6 +455,8 @@ mamaderas :function(){
     $('#navBarMamaderas').navbar();    
     $("#sucesosAlumnoButtons").css("display", "none");
 },
+
+//Envia los datos del suceso mamaderas.
 enviarMamaderas: function(){
     $("#mamaderas-mililitros-error").css("display", "none");
     $("#mamaderas-tomas-error").css("display", "none");
@@ -476,7 +470,7 @@ enviarMamaderas: function(){
     } 
     var tiempo = hora+":"+minutos;
     if($("#mamaderas-mililitros").val() != ""){
-        console.log(fichadiariaElegida.fichadiaria.mamaderas);
+        //Es la primer toma del día.
         if (fichadiariaElegida.fichadiaria.mamaderas == null){
             registroMamaderas.push({"mililitros" : $("#mamaderas-mililitros").val(), "hora" : tiempo});
             registroMamaderas = JSON.stringify(registroMamaderas);
@@ -484,6 +478,7 @@ enviarMamaderas: function(){
             fichadiariaElegida.fichadiaria.mamaderas = JSON.stringify(dataSend);         
         }
         else{
+            //Existen tomas previas.
             var mamaderasVar = JSON.parse(fichadiariaElegida.fichadiaria.mamaderas);
             var tomas = parseInt(mamaderasVar.tomas) + 1;
             tomas = tomas.toString();
@@ -499,7 +494,6 @@ enviarMamaderas: function(){
         var url = server+"/agregarSuceso/mamaderas/"+fichadiariaElegida.fichadiaria._id;
         $.post(url, dataSend, 'json').done(function( data ) {
             asist.cancelarSuceso();
-        
         }).fail(function(jqXHR, textStatus, errorThrown) {
             irAPaginaError();
         });  
@@ -511,6 +505,8 @@ enviarMamaderas: function(){
     }    
 
 },
+
+//Mostrar panel de suceso almuerzo.
 almuerzo :function(){
     $("#sucesosPanel").html("");
     var f = "<h3>Almuerzo</h3><form>";   
@@ -530,17 +526,19 @@ almuerzo :function(){
     $('#navBarAlmuerzo').navbar();       
     $('#almuerzo-select').selectmenu();    
 },
+
+//Envia los datos del suceso almuerzo.
 enviarAlmuerzo: function(){
     var dataSend = {"comportamiento" : encodeURIComponent($("#almuerzo-select").val())};
-    //console.log($("#alumnoIndividualPanel").attr("idAlumno"));
     var url = server+"/agregarSuceso/almuerzo/"+fichadiariaElegida.fichadiaria._id;
     $.post(url, dataSend, 'json').done(function( data ) {
         asist.cancelarSuceso();
-
     }).fail(function(jqXHR, textStatus, errorThrown) {
         irAPaginaError();
     });
 },
+
+//Mostrar panel de suceso postre.
 postre :function(){
     $("#sucesosPanel").html("");
     var f = "<h3>Postre</h3><form>";
@@ -560,9 +558,10 @@ postre :function(){
     $('#navBarPostre').navbar();        
     $('#postre-select').selectmenu();      
 },
+
+//Envia los datos del suceso postre.
 enviarPostre :function(){
     var dataSend = {"comportamiento" : encodeURIComponent($("#postre-select").val())};
-    //console.log($("#alumnoIndividualPanel").attr("idAlumno"));
     var url = server+"/agregarSuceso/postre/"+fichadiariaElegida.fichadiaria._id;
     $.post(url, dataSend, 'json').done(function( data ) {
         asist.cancelarSuceso();
@@ -571,6 +570,8 @@ enviarPostre :function(){
         irAPaginaError();
     });
 },
+
+//Mostrar panel de suceso merienda.
 merienda: function(){
     $("#sucesosPanel").html("");
     var f = "<h3>Merienda</h3><form>";
@@ -590,19 +591,19 @@ merienda: function(){
     $('#navBarMerienda').navbar();        
     $('#merienda-select').selectmenu();    
 },
-enviarMerienda: function(){
-    console.log('ln 316');
-    var dataSend = {"comportamiento" : encodeURIComponent($("#merienda-select").val())};
-    //console.log($("#alumnoIndividualPanel").attr("idAlumno"));
 
+//Envia los datos del suceso merienda.
+enviarMerienda: function(){
+    var dataSend = {"comportamiento" : encodeURIComponent($("#merienda-select").val())};
     var url = server+"/agregarSuceso/merienda/"+fichadiariaElegida.fichadiaria._id;
     $.post(url, dataSend, 'json').done(function( data ) {
         asist.cancelarSuceso();
-
     }).fail(function(jqXHR, textStatus, errorThrown) {
         irAPaginaError();
     });
 },
+
+//Mostrar panel de envío de notas.
 notas :function(){
     $("#sucesosPanel").html("");
     var f = "<h3>Nota</h3><form>";
@@ -619,6 +620,8 @@ notas :function(){
     $('#textarea-nota').textinput();  
     $('#navBarNotas').navbar();    
 },
+
+//Envia los datos de la nota.
 enviarNota :function(){
     $("#textarea-nota-error").css("display", "none");
     if ($("#textarea-nota").val() != ""){
@@ -626,7 +629,6 @@ enviarNota :function(){
         var url = server+"/agregarNota/"+fichadiariaElegida.fichadiaria._id;
         $.post(url, dataSend, 'json').done(function( data ) {
             asist.cancelarSuceso();
-
         }).fail(function(jqXHR, textStatus, errorThrown) {
             irAPaginaError();
         });
@@ -635,6 +637,8 @@ enviarNota :function(){
         $("#textarea-nota-error").css("display", "block");
     }
 },
+
+//Mostrar panel de suceso siesta.
 siesta: function(){
     $("#sucesosPanel").html("");
     var f = "<h3>Siesta</h3><form>";
@@ -651,6 +655,8 @@ siesta: function(){
     $('#navBarSiesta').navbar();        
     $('#siesta-select').slider();      
 }, 
+
+//Envia los datos del suceso siesta.
 enviarSiesta :function(){
     var dataSend = {"minutos" : encodeURIComponent($("#siesta-select").val())};
     var url = server+"/agregarSuceso/siesta/"+fichadiariaElegida.fichadiaria._id;
@@ -661,13 +667,16 @@ enviarSiesta :function(){
         irAPaginaError();
     });
 },
+
+//Cancela un suceso cargado.
 cancelarSuceso :function(){
     $("#sucesosPanel").html("");
     $("#sucesosAlumnoButtons").css("display", "block"); 
 },
+
+//Esta función permite inicializar el asistenciario
+//con otra clase.
 reiniciarAsistenciario :function(){
-    //Esta función permite inicializar el asistenciario
-    //con otra clase.
     $("#alumnoIndividualPanel").attr("idAlumno", "");
     asist.cancelarSuceso();
     $("#initOptions").css("display", "block");
@@ -677,12 +686,15 @@ reiniciarAsistenciario :function(){
     $("#alumnosPanelTitle").css("display", "none");
     $("#retiradosPanelTitle").css("display", "none");
     $("#ausentesPanelTitle").css("display", "none");
-    
     $("#retiradosPanel").html("");
     $("#ausentesPanel").html("");
     $("#alumnosPanel").html("");  
     asist.loadClases();
 },
+
+//Muestra la ficha diaria de un alumno en particular, para la fecha en cuestión.
+//Pide al servidor la ficha diaria y va desplegando cada uno de los sucesos (en
+//caso de existir) así como el horario de entrada y salida.
 fichaDiariaAlumno :function(){
     var fichaDiariaId = fichadiariaElegida.fichadiaria._id;
     asist.cancelarSuceso();
@@ -692,7 +704,7 @@ fichaDiariaAlumno :function(){
          htmlFichaDiaria += "<h3 id='fichaDiariaPanelNombre' style=\"color: orange\">"+data.alumno.nombres+" "+data.alumno.apellidos+"</h3>";
          $( "#fichaDiariaPanel" ).append(htmlFichaDiaria);
          htmlFichaDiaria = "";
-         if (data.panhales != null){
+         if (data.panhales !== null){
             var pan = JSON.parse(data.panhales);
             htmlFichaDiaria = "<label style=\"color : #48a4ff\" for=\"panhalesTabla\">Pañales</label>";
             htmlFichaDiaria += "<table data-role=\"table\" id=\"panhalesTabla\"><thead><tr><th>Hora</th><th>Orinó</th><th>Evacuó</th></tr></thead>";
@@ -704,9 +716,8 @@ fichaDiariaAlumno :function(){
             htmlFichaDiaria += "<a href='#' style='display: none' class='btEdit ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext' onclick='asist.borrarSuceso(\"panhales\")'></a>";
             htmlFichaDiaria += "<hr />";
             $( "#fichaDiariaPanel" ).append(htmlFichaDiaria);
-             //$("#panhalesTabla").table("rebuild");
          }
-        if (data.mamaderas != null){
+        if (data.mamaderas !== null){
             var mam = JSON.parse(data.mamaderas);
             htmlFichaDiaria = "<label style=\"color : #48a4ff\" for=\"mamaderasTabla\">Mamaderas</label>";
             htmlFichaDiaria += "<table data-role=\"table\" id=\"mamaderasTabla\">";
@@ -720,41 +731,42 @@ fichaDiariaAlumno :function(){
             htmlFichaDiaria += "<hr />";          
              $( "#fichaDiariaPanel" ).append(htmlFichaDiaria);
          }
-         if (data.almuerzo != null){
+         if (data.almuerzo !== null){
             var alm = JSON.parse(data.almuerzo); 
             htmlFichaDiaria = "<table data-role=\"table\" id=\"almuerzoTabla\"><tr><td>Almuerzo</td>";
             htmlFichaDiaria += "<td style=\"color: orange\">"+alm.comportamiento+"</td></tr></table>";
             htmlFichaDiaria += "<a href='#' style='display: none' class='btEdit ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext' onclick='asist.borrarSuceso(\"almuerzo\")'></a>";
              $( "#fichaDiariaPanel" ).append(htmlFichaDiaria);
          }     
-         if (data.postre != null){
+         if (data.postre !== null){
             var alm = JSON.parse(data.postre);
             htmlFichaDiaria = "<table data-role=\"table\" id=\"postreTabla\"><tr><td>Postre</td>";
             htmlFichaDiaria += "<td style=\"color: orange\">"+alm.comportamiento+"</td></tr></table>";
             htmlFichaDiaria += "<a href='#' style='display: none' class='btEdit ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext' onclick='asist.borrarSuceso(\"postre\")'></a>";
              $( "#fichaDiariaPanel" ).append(htmlFichaDiaria);
          }  
-         if (data.merienda != null){
+         if (data.merienda !== null){
             var alm = JSON.parse(data.merienda);
             htmlFichaDiaria = "<table data-role=\"table\" id=\"meriendaTabla\"><tr><td>Merienda</td>";
             htmlFichaDiaria += "<td style=\"color: orange\">"+alm.comportamiento+"</td></tr></table>";
             htmlFichaDiaria += "<a href='#' style='display: none' class='btEdit ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext' onclick='asist.borrarSuceso(\"merienda\")'></a>";
              $( "#fichaDiariaPanel" ).append(htmlFichaDiaria);
          }   
-         if (data.siesta != null){
+         if (data.siesta !== null){
             var sis = JSON.parse(data.siesta);
             htmlFichaDiaria = "<table data-role=\"table\" id=\"siestaTabla\"><tr><td>Siesta</td>";
             htmlFichaDiaria += "<td style=\"color: orange\">"+sis.minutos+" minutos</td></tr></table>";
             htmlFichaDiaria += "<a href='#' style='display: none' class='btEdit ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext' onclick='asist.borrarSuceso(\"siesta\")'></a>";
              $( "#fichaDiariaPanel" ).append(htmlFichaDiaria);
          }          
-         if (data.nota != null){
+         if (data.nota !== null){
             htmlFichaDiaria = "<hr /><label style=\"color : #48a4ff\">Nota</label>";
             htmlFichaDiaria += "<p id=\"notaOutput\">"+data.nota+"</p>";
             htmlFichaDiaria += "<a href='#' style='display: none' class='btEdit ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext' onclick='asist.borrarSuceso(\"nota\")'></a>";
              $( "#fichaDiariaPanel" ).append(htmlFichaDiaria);
-         }     
-         if (data.entrada != null){
+         }
+         //Manipula el horario de entrada.     
+         if (data.entrada !== null){
             try{
                 var d = new Date(data.entrada);
                 var minutes = d.getMinutes();
@@ -766,10 +778,11 @@ fichaDiariaAlumno :function(){
                 $( "#fichaDiariaPanel" ).append(htmlFichaDiaria);
             }
             catch(e){
-                console.log("Fallo en la fecha.");
+                alert("Fallo en la fecha del sistema.");
             }
          } 
-         if (data.salida != null){
+         //Manipula el horario de salida.
+         if (data.salida !== null){
             try{
                 var d = new Date(data.salida);
                 var minutes = d.getMinutes();
@@ -783,7 +796,7 @@ fichaDiariaAlumno :function(){
                 $( "#fichaDiariaNosefue" ).append(htmlFichaDiaria);
             }
             catch(e){
-                console.log("Fallo en la fecha."); 
+                alert("Fallo en la fecha."); 
             }            
          }                          
     }).fail(function(jqXHR, textStatus, errorThrown) {
@@ -797,13 +810,15 @@ fichaDiariaAlumno :function(){
         showLoadMsg: true
     });
 },
+
+//Habilita los botones de edición.
 editarFichaDiaria :function(){
     $(".btEdit").css("display", "block");
 },
+
+//Elimina el suceso elegido.
 borrarSuceso :function(sucesoParaBorrar){
-    console.log(sucesoParaBorrar);
     var url = server+"/desmarcarSuceso/"+sucesoParaBorrar+"/"+fichadiariaElegida.fichadiaria._id;
-    console.log(url);
     $.post(url, function(result){
         asist.cancelarSuceso();
         delete fichadiariaElegida.fichadiaria[sucesoParaBorrar];
@@ -818,11 +833,12 @@ borrarSuceso :function(sucesoParaBorrar){
         irAPaginaError();
     }); 
 },
-capturePhoto :function() {
+
 //Toma la foto usando la cámara del dispotivo y la retorna como una imagen
 //base64-enconded
 //Si es un caso de éxito llama a onPhotoDataSuccess, en caso contrario,
 //llama a onFail.
+capturePhoto :function() {
     if (deviceType == "iPhone"){
         navigator.camera.getPicture(capturePhotoSuccess, capturePhotoFail, {
             quality: 30,
@@ -842,13 +858,12 @@ capturePhoto :function() {
         });       
     }
 },
+
+//Descripción: Esta función es utilizada para subir las imágenes.
+//Pido el área donde está la imagen.
+//Pido el "source" de la imagen. Notar que en las funciones
+//capturePhotoSuccess y getPhotoSuccess se carga el source
 uploadImagen :function() { 
-    //Descripción: Esta función es utilizada para subir las imágenes.
-    //Pido el área donde está la imagen.
-    //var img = $("#image");
-    //console.log(img);
-    //Pido el "source" de la imagen. Notar que en las funciones
-    //capturePhotoSuccess y getPhotoSuccess se carga el source
     var imageURI = $("#image").attr("src");
     //Creo las opciones. Es parte de FileTransfer.
     var options = new FileUploadOptions();
@@ -858,19 +873,16 @@ uploadImagen :function() {
     //Dentro de las opciones puedo agregar parámetros, los cuáles viajan 
     //en el body del post en formato json.
     var params = new Object();
-
     params.alumnoId =  fichadiariaElegida.fichadiaria.alumno.idAlumno;
     options.params = params;
-    console.log(params);
     var ft = new FileTransfer();
     ft.upload(imageURI, server+"/subirImagenAlumno", uploadImagenSuccess, uploadImagenFail,
             options);
-
     var idFDQuery = "#"+fichadiariaElegida.fichadiaria._id;
     $(idFDQuery).children("a").children("img").attr("src", imageURI);
-    console.log(alumnoIdFoto);
-
 },
+
+//Cierra la aplicación
 salir :function() {
     navigator.app.exitApp();
 }
