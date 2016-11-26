@@ -164,9 +164,9 @@ generarAsistenciario :function(){
                  //Itero por cada ficha diaria para ir cargando el asistenciario.   
                     var asistenciarioItem = {};
                     asistenciarioItem.fichadiaria = val;
-                    if(val.entrada !== null){ 
+                    if(val.entrada != null){ 
                         //Tiene marcada la entrada.
-                        if (val.salida === null){
+                        if (val.salida == null){
                             asistenciarioItem['estado'] = "En clase";
                         }
                         else{
