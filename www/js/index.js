@@ -68,7 +68,7 @@ var crearMapaAlumnosPics = function(){
     $.getJSON( server+"/alumnosDeClase/"+$("#clasesList").val(), function( data ) {
         $.each( data, function( key, val ) {
             var pic = val.pic;
-            if (pic !== null){
+            if (pic != null){
                 mapaAlumnosPics[val._id] = val.url+"/"+val.nombreArchivo;
             }
             
@@ -143,9 +143,9 @@ generarAsistenciario :function(){
     //En caso de que tenga imagen asociado, cargo su ruta en el servidor.
     //Si no tiene, pido la imagen por defecto. 
         for (i = 0; i < dataAlumno.length; i++){
-            if (dataAlumno[i].pic !== null){
+            if (dataAlumno[i].pic != null){
                 var pic = dataAlumno[i].pic;
-                if (pic !== null){
+                if (pic != null){
                         mapaAlumnosPics[dataAlumno[i]._id] = server+"/miniaturas/"+pic.nombreArchivo;
                 }
                 else{
@@ -704,7 +704,7 @@ fichaDiariaAlumno :function(){
          htmlFichaDiaria += "<h3 id='fichaDiariaPanelNombre' style=\"color: orange\">"+data.alumno.nombres+" "+data.alumno.apellidos+"</h3>";
          $( "#fichaDiariaPanel" ).append(htmlFichaDiaria);
          htmlFichaDiaria = "";
-         if (data.panhales !== null){
+         if (data.panhales != null){
             var pan = JSON.parse(data.panhales);
             htmlFichaDiaria = "<label style=\"color : #48a4ff\" for=\"panhalesTabla\">Pañales</label>";
             htmlFichaDiaria += "<table data-role=\"table\" id=\"panhalesTabla\"><thead><tr><th>Hora</th><th>Orinó</th><th>Evacuó</th></tr></thead>";
@@ -717,7 +717,7 @@ fichaDiariaAlumno :function(){
             htmlFichaDiaria += "<hr />";
             $( "#fichaDiariaPanel" ).append(htmlFichaDiaria);
          }
-        if (data.mamaderas !== null){
+        if (data.mamaderas != null){
             var mam = JSON.parse(data.mamaderas);
             htmlFichaDiaria = "<label style=\"color : #48a4ff\" for=\"mamaderasTabla\">Mamaderas</label>";
             htmlFichaDiaria += "<table data-role=\"table\" id=\"mamaderasTabla\">";
@@ -731,42 +731,43 @@ fichaDiariaAlumno :function(){
             htmlFichaDiaria += "<hr />";          
              $( "#fichaDiariaPanel" ).append(htmlFichaDiaria);
          }
-         if (data.almuerzo !== null){
+         if (data.almuerzo != null){
             var alm = JSON.parse(data.almuerzo); 
             htmlFichaDiaria = "<table data-role=\"table\" id=\"almuerzoTabla\"><tr><td>Almuerzo</td>";
             htmlFichaDiaria += "<td style=\"color: orange\">"+alm.comportamiento+"</td></tr></table>";
             htmlFichaDiaria += "<a href='#' style='display: none' class='btEdit ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext' onclick='asist.borrarSuceso(\"almuerzo\")'></a>";
              $( "#fichaDiariaPanel" ).append(htmlFichaDiaria);
          }     
-         if (data.postre !== null){
+         if (data.postre != null){
             var alm = JSON.parse(data.postre);
             htmlFichaDiaria = "<table data-role=\"table\" id=\"postreTabla\"><tr><td>Postre</td>";
             htmlFichaDiaria += "<td style=\"color: orange\">"+alm.comportamiento+"</td></tr></table>";
             htmlFichaDiaria += "<a href='#' style='display: none' class='btEdit ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext' onclick='asist.borrarSuceso(\"postre\")'></a>";
              $( "#fichaDiariaPanel" ).append(htmlFichaDiaria);
          }  
-         if (data.merienda !== null){
+         if (data.merienda != null){
             var alm = JSON.parse(data.merienda);
             htmlFichaDiaria = "<table data-role=\"table\" id=\"meriendaTabla\"><tr><td>Merienda</td>";
             htmlFichaDiaria += "<td style=\"color: orange\">"+alm.comportamiento+"</td></tr></table>";
             htmlFichaDiaria += "<a href='#' style='display: none' class='btEdit ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext' onclick='asist.borrarSuceso(\"merienda\")'></a>";
              $( "#fichaDiariaPanel" ).append(htmlFichaDiaria);
          }   
-         if (data.siesta !== null){
+         if (data.siesta != null){
             var sis = JSON.parse(data.siesta);
             htmlFichaDiaria = "<table data-role=\"table\" id=\"siestaTabla\"><tr><td>Siesta</td>";
             htmlFichaDiaria += "<td style=\"color: orange\">"+sis.minutos+" minutos</td></tr></table>";
             htmlFichaDiaria += "<a href='#' style='display: none' class='btEdit ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext' onclick='asist.borrarSuceso(\"siesta\")'></a>";
              $( "#fichaDiariaPanel" ).append(htmlFichaDiaria);
          }          
-         if (data.nota !== null){
+         if (data.nota != null){
             htmlFichaDiaria = "<hr /><label style=\"color : #48a4ff\">Nota</label>";
             htmlFichaDiaria += "<p id=\"notaOutput\">"+data.nota+"</p>";
             htmlFichaDiaria += "<a href='#' style='display: none' class='btEdit ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext' onclick='asist.borrarSuceso(\"nota\")'></a>";
              $( "#fichaDiariaPanel" ).append(htmlFichaDiaria);
          }
-         //Manipula el horario de entrada.     
-         if (data.entrada !== null){
+         //Manipula el horario de entrada.   
+         console.log(data.entrada);  
+         if (data.entrada != null){
             try{
                 var d = new Date(data.entrada);
                 var minutes = d.getMinutes();
@@ -782,7 +783,7 @@ fichaDiariaAlumno :function(){
             }
          } 
          //Manipula el horario de salida.
-         if (data.salida !== null){
+         if (data.salida != null){
             try{
                 var d = new Date(data.salida);
                 var minutes = d.getMinutes();
