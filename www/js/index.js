@@ -233,7 +233,7 @@ generarAsistenciario :function(){
 loadClases : function(){
     $.getJSON( server + "/clasesAsistenciario/" + device.uuid, function( data ) {
 
-        if(data === 1) {
+        if(data == 1) {
             $(':mobile-pagecontainer').pagecontainer('change', '#solicitudEnviadaPage', {
                 transition: 'flip',
                 changeHash: false,
